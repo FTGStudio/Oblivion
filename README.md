@@ -1,2 +1,2 @@
 # Oblivion
-LoRa Based Scripts and Configurations
+OpenBCI EEG Based Scripts and Configurations
