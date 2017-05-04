@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib as pl
+from matplotlib import pyplot as pl
 from biosppy import storage
 
 signal, mdata = storage.load_txt('Nicks_ECG_single_channel.csv')
