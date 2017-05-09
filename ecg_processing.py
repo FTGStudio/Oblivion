@@ -14,5 +14,4 @@ out = ecg.ecg(signal=signal, sampling_rate=Fs, show=False)
 pl.plot(ts, signal, lw=2)
 pl.grid()
 #pl.show()
-print(out)
-
+print(out[6][-1])
