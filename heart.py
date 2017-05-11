@@ -18,6 +18,7 @@ class heart:
 
     def process(self):
         result = ecg.ecg(signal=self.sig, sampling_rate=self.Fs, show=False)
+        print result['heart_rate']
 
     def process_show(self):
         result = ecg.ecg(signal=self.sig, sampling_rate=self.Fs, show=True)
