@@ -16,8 +16,15 @@ class heart:
         print "Signal:"
         print self.sig
 
+    def print_heart_rate(self):
+        print self.result['heart_rate']
+
     def process(self):
-        result = ecg.ecg(signal=self.sig, sampling_rate=self.Fs, show=False)
+        self.result = ecg.ecg(signal=self.sig, sampling_rate=self.Fs, show=False)
 
     def process_show(self):
-        result = ecg.ecg(signal=self.sig, sampling_rate=self.Fs, show=True)
+        self.result = ecg.ecg(signal=self.sig, sampling_rate=self.Fs, show=True)
+
+    def calc_avg_heart_rate(self):
+        self.avg_hr = np.mean(self.result['heart_rate'])
+        return self.avg_hr
