@@ -1,6 +1,7 @@
 from biosppy import storage
 from heart import heart
 from RepeatedTimer import RepeatedTimer
+from ecg_lora import lora
 
 
 class ex_proc:
@@ -21,11 +22,23 @@ class ex_proc:
         # Set the time to increase by 3 seconds
         self.i += 3
 
+# Set up LoRa mote
+mote = lora()
+print "Setting up LoRa mote..."
+mote.start_up()
+print "Connecting to LoRa gateway..."
+mote.connect()
+
 # Import the data from a csv file
+print "Importing data from CSV..."
 signal, mdata = storage.load_txt('nicks_heart_1.csv')
 # Create class for heart process
 h = heart(mdata['sampling_rate'])
 # Create an object for the example class
 a = ex_proc()
 # Set the function to run every x seconds
-RepeatedTimer(3,a.getData,h,signal)
+print "Set timer to process data repeatedly..."
+pros_timer = RepeatedTimer(3,a.getData,h,signal)
+# Set the mote to send every minute
+print "Set timer to send data repeatedly..."
+mote_timer = RepeatedTimer(60,mote.send_data,"11111111")

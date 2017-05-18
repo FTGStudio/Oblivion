@@ -5,7 +5,7 @@ class lora:
     def __init__(self):
         # Set up serial port with LoRa mote
         self.ser = serial.Serial(
-            port = 'COM7',
+            port = 'COM9',
             baudrate = 9600,
             parity = serial.PARITY_ODD,
             stopbits = serial.STOPBITS_TWO,
@@ -30,7 +30,21 @@ class lora:
         if out == output + '\r\n':
             print "good"
         else:
-            print "bad"
+            print "bad: " + out
 
-n = lora()
-n.send_n_verify("mac set appkey 989BC0559766877D7246D4CF96050DB5","ok")
+    def start_up(self):
+        self.send_n_verify("mac set appkey 989BC0559766877D7246D4CF96050DB5","ok")
+        self.send_n_verify("mac set appeui 70B3D57EF000396E","ok")
+        self.send_n_verify("mac set adr off","ok")
+        self.send_n_verify("mac save","ok")
+
+    def connect(self):
+        self.send_n_verify("mac join otaa","ok")
+
+    def send_data(self, data):
+        print "Sending data! " + data
+        self.send_n_verify("mac tx cnf 1 " + data,"ok")
+
+# n = lora()
+# n.start_up()
+# n.send_data("123456780")
