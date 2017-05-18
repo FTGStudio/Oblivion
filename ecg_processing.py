@@ -3,10 +3,17 @@ from heart import heart
 from RepeatedTimer import RepeatedTimer
 from ecg_lora import lora
 
+def send_packet_over_lora():
+    mote.send_data(5,a.get_hr_int())
 
 class ex_proc:
+
     def __init__(self):
         self.i=0
+        self.hr = 4
+
+    def get_hr_int(self):
+        return int(self.hr)
 
     def getData(self,h_obj,signal):
         # Set the signal to be the previous 5 seconds of data
@@ -18,9 +25,11 @@ class ex_proc:
         # Print the calculated heart rates
         # h_obj.print_heart_rate()
         # Print the calculated average heart rate
-        print h_obj.calc_avg_heart_rate()
+        self.hr = h_obj.calc_avg_heart_rate()
+        print int(self.hr)
         # Set the time to increase by 3 seconds
         self.i += 3
+        zzz = int(self.hr)
 
 # Set up LoRa mote
 mote = lora()
@@ -41,4 +50,6 @@ print "Set timer to process data repeatedly..."
 pros_timer = RepeatedTimer(3,a.getData,h,signal)
 # Set the mote to send every minute
 print "Set timer to send data repeatedly..."
-mote_timer = RepeatedTimer(60,mote.send_data,"11111111")
+# mote_timer = RepeatedTimer(15,mote.send_data,0,61)
+# mote_timer = RepeatedTimer(15,mote.send_data,5,a.get_hr_int)
+mote_timer = RepeatedTimer(15, send_packet_over_lora)

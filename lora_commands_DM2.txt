@@ -12,12 +12,13 @@
  mac save
  # wait for "ok"
  mac join otaa # you will have to join each time the mote is powered on
- # wait for "ok", should reply success or denied
+ # wait for "ok", then "accepted" or "denied"
 
  #to transmit#
  mac tx <type> <portno> <data>
     #  where type is cnf or uncnf, portno is a  between 1 and 223
     #  and data is a 16 or 32 bit hex number i.e. 0136aa
+	# Wait for "ok" and "mac_tx_ok"
 
 
  #optional#

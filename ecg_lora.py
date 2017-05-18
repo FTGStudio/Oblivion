@@ -1,5 +1,6 @@
 import serial
 import time
+from bitstring import BitArray
 
 class lora:
     def __init__(self):
@@ -12,13 +13,17 @@ class lora:
             bytesize = serial.SEVENBITS)
         # Open the port
         self.ser.isOpen()
+        # Initialize the message id
+        self.msgID = 0
 
     def send(self, input):
         # send the character to the device
         self.ser.write(input + '\r\n')
+
+    def receive(self):
         # let's wait one second before reading output (let's give device time to answer)
         time.sleep(1)
-        # Read in the reply
+        # Receive the reply
         out = ''
         while self.ser.inWaiting() > 0:
             out += self.ser.read(1)
@@ -26,14 +31,13 @@ class lora:
         return out
 
     def send_n_verify(self, input, output):
-        out = self.send(input)
-        if out == output + '\r\n':
-            print "good"
-        else:
-            print "bad: " + out
+        self.send(input)
+        out = self.receive()
+        if out != output + '\r\n':
+            print "Failed: " + out
 
     def start_up(self):
-        self.send_n_verify("mac set appkey 989BC0559766877D7246D4CF96050DB5","ok")
+        self.send_n_verify("mac set appkey FC50E986B86514E4F03F1F2842C5C3D0","ok")
         self.send_n_verify("mac set appeui 70B3D57EF000396E","ok")
         self.send_n_verify("mac set adr off","ok")
         self.send_n_verify("mac save","ok")
@@ -41,10 +45,61 @@ class lora:
     def connect(self):
         self.send_n_verify("mac join otaa","ok")
 
-    def send_data(self, data):
-        print "Sending data! " + data
-        self.send_n_verify("mac tx cnf 1 " + data,"ok")
+        while True:
+            status = self.receive()
+            if status != '':
+                if status == 'accepted\r\n':
+                    print "Join Server Status: " + status.rstrip()
+                    break
+                else:
+                    print "Join Server Status: " + status.rstrip()
+                    self.send_n_verify("mac join otaa","ok")
 
-# n = lora()
-# n.start_up()
-# n.send_data("123456780")
+    def build_package(self,heartStatus,heartRate):
+        curTime = time.gmtime()
+
+        hour = curTime[3]
+        hourB = [int(x) for x in '{:05b}'.format(hour)]
+        hourB = hourB[:5]
+
+        minute = curTime[4]
+        minuteB = [int(x) for x in '{:06b}'.format(minute)]
+        minuteB = minuteB[:6]
+
+        second = curTime[5]
+
+        heartStatusB = [int(x) for x in '{:05b}'.format(heartStatus)]
+        heartStatusB = heartStatusB[:5]
+
+        heartRateB = [int(x) for x in '{:08b}'.format(heartRate)]
+        heartRateB = heartRateB[:8]
+
+        msgIDB = [int(x) for x in '{:08b}'.format(self.msgID)]
+        if(self.msgID >= 255):
+            self.msgID = 0
+        else:
+            self.msgID += 1
+
+        messageB = msgIDB + hourB + minuteB + heartStatusB + heartRateB
+        messageB = BitArray(messageB)
+        message = format(messageB.uint, 'x').zfill(8)
+
+        return message
+
+    def send_data(self, heartStatus, heartRate):
+        # Build the message
+        message = self.build_package(heartStatus,heartRate)
+        # Connect to the server
+        self.connect()
+        # Send package
+        print "Sending data: " + message
+        self.send_n_verify("mac tx cnf 1 " + message,"ok")
+        while True:
+            status = self.receive()
+            if status != '':
+                if status == 'mac_tx_ok\r\n':
+                    print "message status: " + status.rstrip()
+                    break
+                else:
+                    print "message status: " + status.rstrip()
+                    self.send_n_verify("mac tx cnf 1 " + message,"ok")
