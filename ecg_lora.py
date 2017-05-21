@@ -6,7 +6,7 @@ class lora:
     def __init__(self):
         # Set up serial port with LoRa mote
         self.ser = serial.Serial(
-            port = 'COM9',
+            port = '/dev/ttyACM0',
             baudrate = 9600,
             parity = serial.PARITY_ODD,
             stopbits = serial.STOPBITS_TWO,
