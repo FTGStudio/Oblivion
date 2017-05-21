@@ -4,6 +4,7 @@ from biosppy import storage
 from heart import heart
 from RepeatedTimer import RepeatedTimer
 from ecg_lora import lora
+from coms import get_com
 
 def send_packet_over_lora():
     mote.send_data(5,a.get_hr_int())
@@ -34,7 +35,7 @@ class ex_proc:
         zzz = int(self.hr)
 
 # Set up LoRa mote
-mote = lora()
+mote = lora(get_com())
 print "Setting up LoRa mote..."
 mote.start_up()
 print "Connecting to LoRa gateway..."

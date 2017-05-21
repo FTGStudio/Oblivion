@@ -1,12 +1,15 @@
 import serial
 import time
 from bitstring import BitArray
+import serial.tools.list_ports as serP
+import platform
+
 
 class lora:
-    def __init__(self):
+    def __init__(self, com):
         # Set up serial port with LoRa mote
         self.ser = serial.Serial(
-            port = '/dev/ttyACM0',
+            port = com,
             baudrate = 9600,
             parity = serial.PARITY_ODD,
             stopbits = serial.STOPBITS_TWO,
@@ -103,3 +106,5 @@ class lora:
                 else:
                     print "message status: " + status.rstrip()
                     self.send_n_verify("mac tx cnf 1 " + message,"ok")
+
+
