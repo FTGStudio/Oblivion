@@ -1,17 +1,18 @@
 import serial
 import time
 from bitstring import BitArray
+import serial.tools.list_ports as serP
+import platform
 
 # Todo
 #   * Look for if it's already connected to the server
 #   * Clear buffer before reading
 
 class lora:
-
-    def __init__(self):
+    def __init__(self, com):
         # Set up serial port with LoRa mote
         self.ser = serial.Serial(
-            port = 'COM9',
+            port = com,
             baudrate = 9600,
             parity = serial.PARITY_ODD,
             stopbits = serial.STOPBITS_TWO,
@@ -21,11 +22,9 @@ class lora:
         # Initialize the message id
         self.msgID = 0
 
-
     def send(self, input):
         # send the character to the device
         self.ser.write(input + '\r\n')
-
 
     def receive(self):
         # let's wait one second before reading output (let's give device time to answer)
@@ -37,13 +36,11 @@ class lora:
         # return the reply
         return out
 
-
     def send_n_verify(self, input, output):
         self.send(input)
         out = self.receive()
         if out != output + '\r\n':
             print "Failed: " + out
-
 
     def start_up(self):
         self.send_n_verify("mac set appkey FC50E986B86514E4F03F1F2842C5C3D0","ok")
@@ -51,9 +48,7 @@ class lora:
         self.send_n_verify("mac set adr off","ok")
         self.send_n_verify("mac save","ok")
 
-
     def connect(self):
-        # Attemp to join gateway
         self.send_n_verify("mac join otaa","ok")
 
         while True:
@@ -102,6 +97,8 @@ class lora:
     def send_data(self, heartStatus, heartRate):
         # Build the message
         message = self.build_package(heartStatus,heartRate)
+        # Connect to the server
+        self.connect()
         # Send package
         print "Sending data: " + message
         self.send_n_verify("mac tx cnf 1 " + message,"ok")
