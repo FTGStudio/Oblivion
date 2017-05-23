@@ -1,6 +1,7 @@
 import serial
 import time
 import struct
+import numpy as np
 
 class cyton:
     def __init__(self):
@@ -13,6 +14,9 @@ class cyton:
             bytesize = serial.SEVENBITS)
         # Open the port
         self.ser.isOpen()
+        self.winCh1 = np.array([])
+        self.winCh2 = np.array([])
+        self.winCh3 = np.array([])
 
     def start_stream(self):
         # sending a 'v' resets the cyton
@@ -41,14 +45,24 @@ class cyton:
 
         startByte = struct.unpack('<I', out[0] + '\0\0\0')[0]
         seqNum = struct.unpack('<I', out[1] + '\0\0\0' )[0]
-        chan1 = struct.unpack('<i', out[2:5] + '\0')[0]
-        chan2 = struct.unpack('<i', out[5:8] + '\0')[0]
-        chan3 = struct.unpack('<i', out[8:11] + '\0')[0]
-        print '{} {} {} {} {}'.format(startByte, seqNum, chan1, chan2, chan3)
+        self.winCh1 = np.append(self.winCh1, struct.unpack('<i', out[2:5] + '\0')[0])
+        self.winCh2 = np.append(self.winCh2, struct.unpack('<i', out[5:8] + '\0')[0])
+        self.winCh3 = np.append(self.winCh3, struct.unpack('<i', out[8:11] + '\0')[0])
 
 
+    def get_signal(self):
+        temp = self.winCh1
+        #leave last 2 seconds in window
+        self.winCh1 = self.winCh1[-750:]
+        self.winCh2 = self.winCh2[-750:]
+        self.winCh3 = self.winCh3[-750:]
 
-c = cyton()
-c.start_stream()
-while True:
-    c.read_line()
+        return temp
+
+    def is_window_full(self):
+        return len(self.winCh1) >= 1250;
+
+#c = cyton()
+#c.start_stream()
+#while True:
+#    c.read_line()
