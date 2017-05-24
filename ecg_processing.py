@@ -5,6 +5,7 @@ from heart import heart
 from RepeatedTimer import RepeatedTimer
 from ecg_lora import lora
 from coms import get_com
+import time
 
 def send_packet_over_lora():
     mote.send_data(5,a.get_hr_int())
@@ -35,10 +36,15 @@ class ex_proc:
         zzz = int(self.hr)
 
 # Set up LoRa mote
-mote = lora(get_com())
-print "Setting up LoRa mote..."
+# Get LoRa COM port
+print "Get LoRa COM Port...",
+lora_com = get_com()
+print lora_com
+# Set up LoRa object
+mote = lora(lora_com)
+# Set MAC setttings
 mote.start_up()
-print "Connecting to LoRa gateway..."
+# Join server
 mote.connect()
 
 # Import the data from a csv file
@@ -52,6 +58,7 @@ a = ex_proc()
 print "Set timer to process data repeatedly..."
 pros_timer = RepeatedTimer(3,a.getData,h,signal)
 # Set the mote to send every minute
+time.sleep(0.5)
 print "Set timer to send data repeatedly..."
 # mote_timer = RepeatedTimer(15,mote.send_data,0,61)
 # mote_timer = RepeatedTimer(15,mote.send_data,5,a.get_hr_int)
