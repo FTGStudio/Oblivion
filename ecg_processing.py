@@ -30,7 +30,7 @@ class ex_proc:
         # h_obj.print_heart_rate()
         # Print the calculated average heart rate
         self.hr = h_obj.calc_avg_heart_rate()
-        print int(self.hr)
+        # print int(self.hr)
         # Set the time to increase by 3 seconds
         self.i += 3
         zzz = int(self.hr)

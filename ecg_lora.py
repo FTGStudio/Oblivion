@@ -163,7 +163,7 @@ class lora:
 
 
     def send_data(self, heartStatus, heartRate):
-        print "--------------------------------------"
+        print "************************************************"
         print "Sending Heart Message To Server:"
         status = 1
 
@@ -177,6 +177,8 @@ class lora:
         print reply
         if reply != "ok":
             status = 0
+            if reply == "not_joined":
+                self.connect()
         else:
             # Receive confirmation
             print "   LoRa: Transmission Status...",
@@ -190,6 +192,6 @@ class lora:
         else:
             print "LoRa Mote Transmission Failed"
 
-        print "--------------------------------------"
+        print "************************************************"
 
         return status
