@@ -23,18 +23,20 @@ class lora:
         self.ser.isOpen()
         # Initialize the message id
         self.msgID = 0
+        time.sleep(1)
+        self.ser.flush()
 
 
     def send(self, input):
         # Flush the output buffer
-        self.ser.flushOutput()
+        self.ser.reset_output_buffer()
         # send the character to the device
         self.ser.write(input + '\r\n')
 
 
     def receive(self):
         # Flush the input buffer
-        self.ser.flushInput()
+        self.ser.reset_input_buffer()
         # Wait until the mote starts responding
         while self.ser.inWaiting() == 0:
             pass
@@ -166,6 +168,7 @@ class lora:
         print "************************************************"
         print "Sending Heart Message To Server:"
         status = 1
+        try_connect = 0
 
         # Build the message
         message = self.build_package(heartStatus,heartRate)
@@ -178,7 +181,7 @@ class lora:
         if reply != "ok":
             status = 0
             if reply == "not_joined":
-                self.connect()
+                try_connect = 1
         else:
             # Receive confirmation
             print "   LoRa: Transmission Status...",
@@ -193,5 +196,8 @@ class lora:
             print "LoRa Mote Transmission Failed"
 
         print "************************************************"
+
+        if try_connect == 1:
+            self.connect()
 
         return status
