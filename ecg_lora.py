@@ -153,19 +153,28 @@ class lora:
         print "--------------------------------------"
         print "LoRa Connect to Server:"
         status = 1
+        joined = 0
 
-        print "   LoRa: Send Join Otaa Command...",
-        self.send("mac join otaa")
+        print "   LoRa: Get join status...",
+        self.send("mac get status")
         reply = self.receive()
-        if reply != "ok":
-            status = 0
+        if int(reply, 16) & 1:
+            joined = 1
         print reply
 
-        print "   LoRa: Join Otaa...",
-        reply = self.receive()
-        if reply != "accepted":
-            status = 0
-        print reply
+        if joined == 0:
+            print "   LoRa: Send Join Otaa Command...",
+            self.send("mac join otaa")
+            reply = self.receive()
+            if reply != "ok":
+                status = 0
+            print reply
+
+            print "   LoRa: Join Otaa...",
+            reply = self.receive()
+            if reply != "accepted":
+                status = 0
+            print reply
 
         if status == 1:
             print "LoRa Mote Join Successful"
