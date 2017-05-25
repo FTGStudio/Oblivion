@@ -45,8 +45,6 @@ lora_com = get_com()
 print lora_com
 # Set up LoRa object
 mote = lora(lora_com)
-# Set MAC setttings
-mote.start_up()
 # Join server
 mote.connect()
 
@@ -65,4 +63,4 @@ time.sleep(0.5)
 print "Set timer to send data repeatedly..."
 # mote_timer = RepeatedTimer(15,mote.send_data,0,61)
 # mote_timer = RepeatedTimer(15,mote.send_data,5,a.get_hr_int)
-mote_timer = RepeatedTimer(15, send_packet_over_lora)
+mote_timer = RepeatedTimer(60, send_packet_over_lora)

@@ -99,8 +99,19 @@ class lora:
         print "LoRa Mote Setup:"
         status = 1
 
+        print "   LoRa: Getting DEVEUI...",
+        self.send("mac get deveui")
+        reply0 = self.receive()
+        if reply0 == "0004A30B001B116F":
+            appkey = "7ACA0E4643A2DD5E1C767211A36C4F9A"
+        elif reply0 == "0004A30B001BA4AA":
+            appkey = "E87BCEDD933B0676102EDEB62348E3C8"
+        else:
+            status = 0
+        print reply0
+
         print "   LoRa: Setting APPKEY...",
-        self.send("mac set appkey FC50E986B86514E4F03F1F2842C5C3D0")
+        self.send("mac set appkey " + appkey)
         reply1 = self.receive()
         if reply1 != "ok":
             status = 0
@@ -133,6 +144,8 @@ class lora:
             print "LoRa Mote Setup Failed"
 
         print "--------------------------------------"
+        #sleep for mac save to work properly
+        time.sleep(2)
 
         return status
 
