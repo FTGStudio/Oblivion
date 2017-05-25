@@ -20,6 +20,9 @@ class ex_proc:
         return int(self.hr)
 
     def getData(self,h_obj,signal):
+        if ((self.i*250)+1249 >= len(signal)):
+            self.i = 0
+            print "Reset CSV"
         # Set the signal to be the previous 5 seconds of data
         signal_seg = signal[(self.i*250):(self.i*250)+1249]
         # Set the signal to be processed
