@@ -197,7 +197,7 @@ class lora:
 
         # Send package
         print "   LoRa: Sending Transmit Message " + message + "...",
-        self.send("mac tx cnf 1 " + message)
+        self.send("mac tx uncnf 1 " + message)
         reply = self.receive()
         print reply
         if reply != "ok":
