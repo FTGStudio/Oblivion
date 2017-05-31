@@ -2,12 +2,13 @@ import serial
 import time
 import struct
 import numpy as np
+from coms import get_cyton
 
 class cyton:
-    def __init__(self):
+    def __init__(self, com):
         # Set up serial port with Cyton board
         self.ser = serial.Serial(
-            port = '/dev/ttyUSB0',
+            port = com,
             baudrate = 115200,
             parity = serial.PARITY_ODD,
             stopbits = serial.STOPBITS_TWO,
@@ -62,7 +63,8 @@ class cyton:
         return len(self.winCh1) >= 1250;
 
 if __name__ == "__main__":
-    c = cyton()
+    com = get_cyton()
+    c = cyton(com)
     c.start_stream()
     while True:
         c.read_line()

@@ -5,7 +5,7 @@ from heart import heart
 from RepeatedTimer import RepeatedTimer
 from ecg_lora import lora
 from ecg_cyton import cyton
-from coms import get_com
+import coms
 import time
 
 def send_packet_over_lora():
@@ -35,7 +35,7 @@ class ex_proc:
 # Set up LoRa mote
 # Get LoRa COM port
 print "Get LoRa COM Port...",
-lora_com = get_com()
+lora_com = coms.get_com()
 print lora_com
 # Set up LoRa object
 mote = lora(lora_com)
@@ -48,8 +48,10 @@ h = heart(250)
 # Create an object for the example class
 a = ex_proc()
 
+# Get cyton COM port
+cyton_com = coms.get_cyton()
 # Create class for cyton board
-c = cyton()
+c = cyton(cyton_com)
 
 # Set the mote to send every minute
 time.sleep(0.5)
