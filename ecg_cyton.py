@@ -24,7 +24,7 @@ class cyton:
         print 'reset cyton'
 
         # let's wait one second before reading output (let's give device time to answer)
-        time.sleep(2)
+        time.sleep(4)
 
         # Read in the reply
         out = ''
@@ -49,20 +49,20 @@ class cyton:
         self.winCh2 = np.append(self.winCh2, struct.unpack('<i', out[5:8] + '\0')[0])
         self.winCh3 = np.append(self.winCh3, struct.unpack('<i', out[8:11] + '\0')[0])
 
-
     def get_signal(self):
         temp = self.winCh1
         #leave last 2 seconds in window
-        self.winCh1 = self.winCh1[-750:]
-        self.winCh2 = self.winCh2[-750:]
-        self.winCh3 = self.winCh3[-750:]
+        self.winCh1 = self.winCh1[-500:]
+        self.winCh2 = self.winCh2[-500:]
+        self.winCh3 = self.winCh3[-500:]
 
         return temp
 
     def is_window_full(self):
         return len(self.winCh1) >= 1250;
 
-#c = cyton()
-#c.start_stream()
-#while True:
-#    c.read_line()
+if __name__ == "__main__":
+    c = cyton()
+    c.start_stream()
+    while True:
+        c.read_line()
