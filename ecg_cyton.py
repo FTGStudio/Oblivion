@@ -46,9 +46,14 @@ class cyton:
 
         startByte = struct.unpack('<I', out[0] + '\0\0\0')[0]
         seqNum = struct.unpack('<I', out[1] + '\0\0\0' )[0]
-        self.winCh1 = np.append(self.winCh1, struct.unpack('<i', out[2:5] + '\0')[0])
-        self.winCh2 = np.append(self.winCh2, struct.unpack('<i', out[5:8] + '\0')[0])
-        self.winCh3 = np.append(self.winCh3, struct.unpack('<i', out[8:11] + '\0')[0])
+
+        self.winCh1 = np.append(self.winCh1, struct.unpack('>i', ('\0' if out[2] < '\x80' else '\xff') + out[2:5])[0])
+        self.winCh2 = np.append(self.winCh2, struct.unpack('>i', ('\0' if out[5] < '\x80' else '\xff') + out[5:8])[0])
+        self.winCh3 = np.append(self.winCh3, struct.unpack('>i', ('\0' if out[8] < '\x80' else '\xff') + out[8:11])[0])
+
+    def print_line(self):
+        print str(self.winCh1[-1]) + " " + str(self.winCh2[-1]) + " " + str(self.winCh3[-1])
+        
 
     def get_signal(self):
         temp = self.winCh1
@@ -68,3 +73,4 @@ if __name__ == "__main__":
     c.start_stream()
     while True:
         c.read_line()
+        c.print_line()
