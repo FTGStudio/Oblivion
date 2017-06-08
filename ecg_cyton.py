@@ -25,8 +25,7 @@ class cyton:
         print 'reset cyton'
 
         # let's wait one second before reading output (let's give device time to answer)
-        time.sleep(4)
-
+        time.sleep(2)
         # Read in the reply
         out = ''
         while self.ser.inWaiting() > 0:
@@ -40,6 +39,10 @@ class cyton:
         else:
             print 'cyton reset error'
 
+    def stop_stream(self):
+        #sending a 's' to stop stream
+        self.ser.write('s')
+        print 'stop cyton'
 
     def read_line(self):
         out = self.ser.read(33)

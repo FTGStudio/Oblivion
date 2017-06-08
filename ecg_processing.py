@@ -7,12 +7,20 @@ from ecg_lora import lora
 from ecg_cyton import cyton
 import coms
 import time
+import signal
 
 def send_packet_over_lora():
     temp = int(a.get_avg_heart_rate())
     print "Sending: "
     print temp
     mote.send_data(5,temp)
+
+def handler(signum, frame):
+    print 'Signal handler caught ', signum
+    c.stop_stream()
+    mote_timer.stop()
+    exit()
+
 
 class ex_proc:
 
@@ -31,6 +39,9 @@ class ex_proc:
 
     def test_print(self, data):
         print "LORA SEND: " + data
+
+# Set up signal handler for clean up
+signal.signal(signal.SIGINT, handler);
 
 # Set up LoRa mote
 # Get LoRa COM port
