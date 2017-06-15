@@ -1,7 +1,7 @@
 
-
-import serial.tools.list_ports as ser
 import platform
+import serial.tools.list_ports as ser
+
 
 
 #This function just returns the comport of the device in question
@@ -26,7 +26,6 @@ def get_com():
 
     return port
 
-        
 #This function just returns the comport of the device in question
 def get_cyton():
     #The list of com ports, and their values is passed to the ports variable
