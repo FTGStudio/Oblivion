@@ -10,47 +10,6 @@ import time
 import signal
 
 
-
-
-class ex_proc:
-
-    def __init__(self):
-        self.heartRate = []
-        self.i = 0
-
-    def add_heart_rate(self, heart_rate):
-        self.heartRate.append(heart_rate)
-
-    def ready_to_send(self):
-        return len(self.heartRate)
-
-    def get_avg_heart_rate(self):
-        temp = 0.0
-        if len(self.heartRate) is not 0:
-            temp = sum(self.heartRate) / float(len(self.heartRate))
-            self.heartRate = []
-        return temp
-
-    def getData(self,h_obj,signal):
-        if ((self.i*250)+1249 >= len(signal)):
-            self.i = 0
-            print "Reset CSV"
-        # Set the signal to be the previous 5 seconds of data
-        signal_seg = signal[(self.i*250):(self.i*250)+1249]
-        # Set the signal to be processed
-        h_obj.set_signal(signal_seg)
-        # Process signal and show the result in the GUI
-        h_obj.process()
-        # Print the calculated heart rates
-        # h_obj.print_heart_rate()
-        # Print the calculated average heart rate
-        self.hr = h_obj.calc_avg_heart_rate()
-        # print int(self.hr)
-        # Set the time to increase by 3 seconds
-        self.i += 3
-        zzz = int(self.hr)
-
-
 # Setup handler for exiting the script if "CTRL+C" is pressed
 def handler(signum, frame):
     print 'Signal handler caught ', signum
@@ -89,8 +48,8 @@ def setupCytonDongle():
         return 0
 
 def send_packet_over_lora(mote):
-    if a.ready_to_send() != 0:
-        temp = int(a.get_avg_heart_rate())
+    if h.ready_to_send() != 0:
+        temp = int(h.get_avg_heart_rate())
         print "Sending: ",
         print temp
         mote.send_data(5,temp)
@@ -109,7 +68,7 @@ if __name__ == "__main__":
     h = heart(250)
 
     # Create an object for the example class
-    a = ex_proc()
+    # a = ex_proc()
 
     # Set up LoRa mote
     mote = setupLoRaMote()
@@ -146,7 +105,7 @@ if __name__ == "__main__":
                 temp = h.calc_avg_heart_rate()
                 print "Avg Heartrate"
                 print temp
-                a.add_heart_rate(temp)
+                h.add_heart_rate(temp)
     else:
         # Import the data from a csv file
         print "Importing data from CSV..."
@@ -154,13 +113,8 @@ if __name__ == "__main__":
         # Create class for heart process
         h = heart(mdata['sampling_rate'])
         # Create an object for the example class
-        a = ex_proc()
+        # a = ex_proc()
         # Set the function to run every x seconds
         print "Set timer to process data repeatedly..."
-        pros_timer = RepeatedTimer(3, a.getData, h, signal)
+        pros_timer = RepeatedTimer(3, h.getData, signal)
         # Set the mote to send every minute
-        time.sleep(0.5)
-        print "Set timer to send data repeatedly..."
-        # mote_timer = RepeatedTimer(15,mote.send_data,0,61)
-        # mote_timer = RepeatedTimer(15,mote.send_data,5,a.get_hr_int)
-        # mote_timer = RepeatedTimer(60, send_packet_over_lora)
