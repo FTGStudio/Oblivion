@@ -20,6 +20,15 @@ class cyton:
         self.winCh3 = np.array([])
 
     def start_stream(self):
+        # sending a 's' stops the cyton
+        self.ser.write('s')
+
+        # sleep waiting for data to stop coming to come in
+        time.sleep(1)
+    
+        # clear possible extra data
+        self.ser.reset_input_buffer()
+
         # sending a 'v' resets the cyton
         self.ser.write('v')
         print 'reset cyton'

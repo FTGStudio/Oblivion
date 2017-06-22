@@ -21,6 +21,9 @@ class ex_proc:
     def add_heart_rate(self, heart_rate):
         self.heartRate.append(heart_rate)
 
+    def ready_to_send(self):
+        return len(self.heartRate)
+
     def get_avg_heart_rate(self):
         temp = 0.0
         if len(self.heartRate) is not 0:
@@ -86,10 +89,13 @@ def setupCytonDongle():
         return 0
 
 def send_packet_over_lora(mote):
-    temp = int(a.get_avg_heart_rate())
-    print "Sending: ",
-    print temp
-    mote.send_data(5,temp)
+    if a.ready_to_send() != 0:
+        temp = int(a.get_avg_heart_rate())
+        print "Sending: ",
+        print temp
+        mote.send_data(5,temp)
+    else:
+        print "No data to send"
 
 
 if __name__ == "__main__":
@@ -116,7 +122,7 @@ if __name__ == "__main__":
 
     if mote != 0:
         print "Set timer to send data repeatedly...",
-        mote_timer = RepeatedTimer(15, send_packet_over_lora, mote)
+        mote_timer = RepeatedTimer(60, send_packet_over_lora, mote)
         print "Done"
 
     if cytonBrd != 0:
@@ -127,8 +133,13 @@ if __name__ == "__main__":
             if cytonBrd.is_window_full():
                 # Set the signal to be processed
                 h.set_signal(cytonBrd.get_signal())
-                # Process signal and show the result in the GUI
-                h.process()
+
+                try:
+                    # Process signal and show the result in the GUI
+                    h.process()
+                except:
+                    print "Processing error. No heartrate"
+                    continue
                 # Print the calculated heart rates
                 # h_obj.print_heart_rate()
                 # Print the calculated average heart rate
