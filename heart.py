@@ -1,4 +1,5 @@
 import numpy as np
+import math
 from biosppy.signals import ecg
 
 class heart:
@@ -9,17 +10,59 @@ class heart:
         self.i = 0
 
     def add_heart_rate(self, heart_rate):
-        self.heartRate.append(heart_rate)
+        if not math.isnan(heart_rate):
+            self.heartRate.append(heart_rate)
 
     def ready_to_send(self):
         return len(self.heartRate)
 
+    """
+    Returns a boolean array with True if points are outliers and False 
+    otherwise.
+
+    Parameters:
+    -----------
+        points : An numobservations by numdimensions array of observations
+        thresh : The modified z-score to use as a threshold. Observations with
+            a modified z-score (based on the median absolute deviation) greater
+            than this value will be classified as outliers.
+
+    Returns:
+    --------
+        mask : A numobservations-length boolean array.
+
+    References:
+    ----------
+        Boris Iglewicz and David Hoaglin (1993), "Volume 16: How to Detect and
+        Handle Outliers", The ASQC Basic References in Quality Control:
+        Statistical Techniques, Edward F. Mykytka, Ph.D., Editor. 
+    """
+    def __is_outlier(self, points, thresh=3.5):
+        if len(points.shape) == 1:
+            points = points[:,None]
+            median = np.median(points, axis=0)
+            diff = np.sum((points - median)**2, axis=-1)
+            diff = np.sqrt(diff)
+            med_abs_deviation = np.median(diff)
+
+        modified_z_score = 0.6745 * diff / med_abs_deviation
+
+        return modified_z_score > thresh
+
+
     def get_avg_heart_rate(self):
         temp = 0.0
+        numData = 0
         if len(self.heartRate) is not 0:
-            temp = sum(self.heartRate) / float(len(self.heartRate))
+            outlier = self.__is_outlier(np.array(self.heartRate))
+            for isOut, beat in zip(outlier, self.heartRate):
+                if not isOut:
+                    temp += beat
+                    numData += 1
+                else:
+                    print beat, " is an outlier"
             self.heartRate = []
-        return temp
+        return temp / numData
 
     def getData(self, signal):
         if (self.i*250)+1249 >= len(signal):
