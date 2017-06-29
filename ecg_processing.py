@@ -9,6 +9,12 @@ import coms
 import time
 import signal
 
+LORA_STATUS_NORMAL = 0
+LORA_STATUS_SLOW = 1
+LORA_STATUS_FAST = 2
+LORA_STATUS_ABNORMAL = 4
+LORA_STATUS_NOT_CONNECTED = 5
+
 
 # Setup handler for exiting the script if "CTRL+C" is pressed
 def handler(signum, frame):
@@ -56,10 +62,51 @@ def send_packet_over_lora(mote):
     else:
         print "No data to send"
 
+def event_status(heart_rate):
+    event_status.loraEventConfidence = 0
+    event_status.message = LORA_STATUS_NORMAL
+
+    if heart_rate is None:
+        if event_status.message != LORA_STATUS_NOT_CONNECTED:
+            event_status.loraEventConfidence = 0
+        event_status.loraEventConfidence += 1
+        event_status.message = LORA_STATUS_NOT_CONNECTED
+    elif heart_rate <= 40:
+        if event_status.message != LORA_STATUS_SLOW:
+            event_status.loraEventConfidence = 0
+        event_status.loraEventConfidence += 1
+        event_status.message = LORA_STATUS_SLOW
+    elif heart_rate >= 120:
+        if event_status.message != LORA_STATUS_FAST:
+            event_status.loraEventConfidence = 0
+        event_status.loraEventConfidence += 1
+        event_status.message = LORA_STATUS_FAST
+    else:
+        if event_status.message != LORA_STATUS_NORMAL:
+            event_status.loraEventConfidence = 0
+        event_status.loraEventConfidence += 1
+        event_status.message = LORA_STATUS_NORMAL
+
+    if event_status.loraEventConfidence == 3:
+        # Get and clear the buffer
+        temp = int(h.get_avg_heart_rate())
+        print "Sending: ",
+        print heart_rate
+        if event_status.message == LORA_STATUS_NOT_CONNECTED:
+            heart_rate = 0
+        mote.send_data(event_status.message, heart_rate)
+
+        mote_timer.stop()
+        mote_timer.start()
+
+
+
 
 if __name__ == "__main__":
     loraMotePresent = 0
     cytonPresent = 0
+    loraEventMessage = LORA_STATUS_NORMAL
+    loraEventConfidence = 0
 
     # Set up signal handler for clean up
     signal.signal(signal.SIGINT, handler)
@@ -98,6 +145,7 @@ if __name__ == "__main__":
                     h.process()
                 except:
                     print "Processing error. No heartrate"
+                    event_status(None)
                     continue
                 # Print the calculated heart rates
                 # h_obj.print_heart_rate()
@@ -105,6 +153,9 @@ if __name__ == "__main__":
                 temp = h.calc_avg_heart_rate()
                 print "Avg Heartrate"
                 print temp
+                
+                event_status(temp)
+                    
                 h.add_heart_rate(temp)
     else:
         # Import the data from a csv file
