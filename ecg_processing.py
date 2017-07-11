@@ -8,13 +8,14 @@ from ecg_cyton import cyton
 import coms
 import time
 import signal
+import math
+import threading
 
 LORA_STATUS_NORMAL = 0
 LORA_STATUS_SLOW = 1
 LORA_STATUS_FAST = 2
 LORA_STATUS_ABNORMAL = 4
 LORA_STATUS_NOT_CONNECTED = 5
-
 
 # Setup handler for exiting the script if "CTRL+C" is pressed
 def handler(signum, frame):
@@ -63,50 +64,62 @@ def send_packet_over_lora(mote):
         print "No data to send"
 
 def event_status(heart_rate):
-    event_status.loraEventConfidence = 0
-    event_status.message = LORA_STATUS_NORMAL
 
-    if heart_rate is None:
-        if event_status.message != LORA_STATUS_NOT_CONNECTED:
-            event_status.loraEventConfidence = 0
-        event_status.loraEventConfidence += 1
-        event_status.message = LORA_STATUS_NOT_CONNECTED
+    global eventStatus
+    global loraEventConfidence
+    global lastSendEvent 
+
+    if heart_rate is None or math.isnan(heart_rate):
+        if eventStatus != LORA_STATUS_NOT_CONNECTED:
+            loraEventConfidence = 0
+        loraEventConfidence += 1
+        print "Lora not connected number"
+        print loraEventConfidence
+        eventStatus = LORA_STATUS_NOT_CONNECTED
     elif heart_rate <= 40:
-        if event_status.message != LORA_STATUS_SLOW:
-            event_status.loraEventConfidence = 0
-        event_status.loraEventConfidence += 1
-        event_status.message = LORA_STATUS_SLOW
+        if eventStatus != LORA_STATUS_SLOW:
+            loraEventConfidence = 0
+        loraEventConfidence += 1
+        print "slow number"
+        print loraEventConfidence
+        eventStatus = LORA_STATUS_SLOW
     elif heart_rate >= 120:
-        if event_status.message != LORA_STATUS_FAST:
-            event_status.loraEventConfidence = 0
-        event_status.loraEventConfidence += 1
-        event_status.message = LORA_STATUS_FAST
+        if eventStatus != LORA_STATUS_FAST:
+            loraEventConfidence = 0
+        loraEventConfidence += 1
+        print "fast number"
+        print loraEventConfidence
+        eventStatus = LORA_STATUS_FAST
     else:
-        if event_status.message != LORA_STATUS_NORMAL:
-            event_status.loraEventConfidence = 0
-        event_status.loraEventConfidence += 1
-        event_status.message = LORA_STATUS_NORMAL
+        if eventStatus != LORA_STATUS_NORMAL:
+            loraEventConfidence = 0
+        loraEventConfidence += 1
+        eventStatus = LORA_STATUS_NORMAL
 
-    if event_status.loraEventConfidence == 3:
+    if loraEventConfidence == 3 and lastSendEvent != eventStatus:
         # Get and clear the buffer
         temp = int(h.get_avg_heart_rate())
-        print "Sending: ",
-        print heart_rate
-        if event_status.message == LORA_STATUS_NOT_CONNECTED:
-            heart_rate = 0
-        mote.send_data(event_status.message, heart_rate)
+        if eventStatus == LORA_STATUS_NOT_CONNECTED:
+            heart_rate = 0.0
+        print "Sending Event: ",
+        print int(heart_rate)
+        t = threading.Thread(target=mote.send_data, args=(eventStatus, int(heart_rate,)))
+        t.start()
+        #mote.send_data(eventStatus, int(heart_rate))
+        lastSendEvent = eventStatus
 
         mote_timer.stop()
         mote_timer.start()
 
 
 
+eventStatus = LORA_STATUS_NORMAL
+lastSendEvent = LORA_STATUS_NORMAL
+loraEventConfidence = 0
 
 if __name__ == "__main__":
     loraMotePresent = 0
     cytonPresent = 0
-    loraEventMessage = LORA_STATUS_NORMAL
-    loraEventConfidence = 0
 
     # Set up signal handler for clean up
     signal.signal(signal.SIGINT, handler)
@@ -139,7 +152,6 @@ if __name__ == "__main__":
             if cytonBrd.is_window_full():
                 # Set the signal to be processed
                 h.set_signal(cytonBrd.get_signal())
-
                 try:
                     # Process signal and show the result in the GUI
                     h.process()
@@ -157,6 +169,7 @@ if __name__ == "__main__":
                 event_status(temp)
                     
                 h.add_heart_rate(temp)
+
     else:
         # Import the data from a csv file
         print "Importing data from CSV..."
