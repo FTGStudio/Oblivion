@@ -55,11 +55,15 @@ def setupCytonDongle():
         return 0
 
 def send_packet_over_lora(mote):
+    global eventStatus
+
     if h.ready_to_send() != 0:
         temp = int(h.get_avg_heart_rate())
+        if eventStatus == LORA_STATUS_NOT_CONNECTED:
+            temp = 0
         print "Sending: ",
         print temp
-        mote.send_data(5,temp)
+        mote.send_data(eventStatus,temp)
     else:
         print "No data to send"
 
@@ -173,7 +177,7 @@ if __name__ == "__main__":
     else:
         # Import the data from a csv file
         print "Importing data from CSV..."
-        signal, mdata = storage.load_txt('nicks_heart_1.csv')
+        signal, mdata = storage.load_txt('/home/pi/Oblivion/nicks_heart_1.csv')
         # Create class for heart process
         h = heart(mdata['sampling_rate'])
         # Create an object for the example class
