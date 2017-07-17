@@ -10,6 +10,7 @@ import time
 import signal
 import math
 import threading
+import os
 
 LORA_STATUS_NORMAL = 0
 LORA_STATUS_SLOW = 1
@@ -122,9 +123,6 @@ lastSendEvent = LORA_STATUS_NORMAL
 loraEventConfidence = 0
 
 if __name__ == "__main__":
-    loraMotePresent = 0
-    cytonPresent = 0
-
     # Set up signal handler for clean up
     signal.signal(signal.SIGINT, handler)
 
@@ -135,54 +133,31 @@ if __name__ == "__main__":
     # a = ex_proc()
 
     # Set up LoRa mote
-    mote = setupLoRaMote()
+    loop = 0;
+    while True:
+        mote = setupLoRaMote()
+        loop += 1
+        if mote != 0:
+            break
+        if loop > 10:
+            os.system('reboot now')
 
-    # Setup Cyton Biosensing board
-    cytonBrd = setupCytonDongle()
 
     # Sleep to allow mote to warm up
     time.sleep(0.5)
 
-    if mote != 0:
-        print "Set timer to send data repeatedly...",
-        mote_timer = RepeatedTimer(60, send_packet_over_lora, mote)
-        print "Done"
+    print "Set timer to send data repeatedly...",
+    mote_timer = RepeatedTimer(60, send_packet_over_lora, mote)
+    print "Done"
 
-    if cytonBrd != 0:
-        cytonBrd.start_stream()
-        while True:
-            cytonBrd.read_line()
-
-            if cytonBrd.is_window_full():
-                # Set the signal to be processed
-                h.set_signal(cytonBrd.get_signal())
-                try:
-                    # Process signal and show the result in the GUI
-                    h.process()
-                except:
-                    print "Processing error. No heartrate"
-                    event_status(None)
-                    continue
-                # Print the calculated heart rates
-                # h_obj.print_heart_rate()
-                # Print the calculated average heart rate
-                temp = h.calc_avg_heart_rate()
-                print "Avg Heartrate"
-                print temp
-                
-                event_status(temp)
-                    
-                h.add_heart_rate(temp)
-
-    else:
-        # Import the data from a csv file
-        print "Importing data from CSV..."
-        signal, mdata = storage.load_txt('/home/pi/Oblivion/nicks_heart_1.csv')
-        # Create class for heart process
-        h = heart(mdata['sampling_rate'])
-        # Create an object for the example class
-        # a = ex_proc()
-        # Set the function to run every x seconds
-        print "Set timer to process data repeatedly..."
-        pros_timer = RepeatedTimer(3, h.getData, signal)
-        # Set the mote to send every minute
+    # Import the data from a csv file
+    print "Importing data from CSV..."
+    signal, mdata = storage.load_txt('/home/pi/Oblivion/nicks_heart_1.csv')
+    # Create class for heart process
+    h = heart(mdata['sampling_rate'])
+    # Create an object for the example class
+    # a = ex_proc()
+    # Set the function to run every x seconds
+    print "Set timer to process data repeatedly..."
+    pros_timer = RepeatedTimer(3, h.getData, signal)
+    # Set the mote to send every minute
