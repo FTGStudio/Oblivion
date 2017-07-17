@@ -21,7 +21,6 @@ LORA_STATUS_NOT_CONNECTED = 5
 # Setup handler for exiting the script if "CTRL+C" is pressed
 def handler(signum, frame):
     print 'Signal handler caught ', signum
-    cytonBrd.stop_stream()
     mote_timer.stop()
     exit()
 
@@ -39,20 +38,6 @@ def setupLoRaMote():
         return mote
     except:
         print "Error - make sure the LoRa mote is plugged in"
-        return 0
-
-def setupCytonDongle():
-    try:
-        print "Get Cyton Biosensing COM Port...",
-        # Get cyton COM port
-        cyton_com = coms.get_cyton()
-        print cyton_com
-        # Create class for cyton board
-        cytonBoard = cyton(cyton_com)
-        # Set flag for the cyton dongle being present
-        return cytonBoard
-    except:
-        print "Error - make sure the Cyton RF dongle is plugged in"
         return 0
 
 def send_packet_over_lora(mote):
