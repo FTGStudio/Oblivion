@@ -103,7 +103,8 @@ def event_status(heart_rate):
 
     if loraEventConfidence == 3 and lastSendEvent != eventStatus:
         # Get and clear the buffer
-        temp = int(h.get_avg_heart_rate())
+        if h.ready_to_send() != 0:
+            temp = int(h.get_avg_heart_rate())
         if eventStatus == LORA_STATUS_NOT_CONNECTED:
             heart_rate = 0.0
         print "Sending Event: ",
