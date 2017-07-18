@@ -42,10 +42,14 @@ class cyton:
 
         # cyton returns '$$$' when done initializing
         if "$$$" in out:
-            # sending a 'b' starts the cyton data stream
-            self.ser.write('b')
-            print 'starting cyton stream'
-            status = 1
+            if "Failure" in out:
+                print 'cyton fail to reply'
+                status = 0
+            else:
+                # sending a 'b' starts the cyton data stream
+                self.ser.write('b')
+                print 'starting cyton stream'
+                status = 1
         else:
             print 'cyton reset error'
             status = 0
