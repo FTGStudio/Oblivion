@@ -180,6 +180,7 @@ class lora:
             print "LoRa Mote Join Successful"
         else:
             print "LoRa Mote Join Failed"
+            raise Exception('Lora connection failed')
 
         print "--------------------------------------"
 

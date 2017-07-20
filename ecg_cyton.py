@@ -45,8 +45,12 @@ class cyton:
             # sending a 'b' starts the cyton data stream
             self.ser.write('b')
             print 'starting cyton stream'
+            status = 1
         else:
             print 'cyton reset error'
+            status = 0
+
+        return status
 
     def stop_stream(self):
         #sending a 's' to stop stream
