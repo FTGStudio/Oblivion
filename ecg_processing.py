@@ -22,6 +22,7 @@ LORA_STATUS_NOT_CONNECTED = 5
 def handler(signum, frame):
     print 'Signal handler caught ', signum
     mote_timer.stop()
+    pros_timer.stop()
     exit()
 
 def setupLoRaMote():
@@ -103,10 +104,41 @@ def event_status(heart_rate):
         mote_timer.start()
 
 
+def getData(signal):
+    global fileLoc
+
+    if (fileLoc*250)+1249 >= len(signal):
+        fileLoc = 0
+        print "Reset CSV"
+    # Set the signal to be the previous 5 seconds of data
+    signal_seg = signal[(fileLoc*250):(fileLoc*250)+1249]
+    # Set the signal to be processed
+    h.set_signal(signal_seg)
+    try:
+        # Process signal and show the result in the GUI
+        h.process()
+    except:
+        print "Processing error. No heartrate"
+        event_status(None)
+        fileLoc += 3
+        return
+
+    # Print the calculated average heart rate
+    temp = h.calc_avg_heart_rate()
+    print "Avg Heartrate"
+    print temp
+
+    event_status(temp)
+
+    # print int(self.hr)
+    h.add_heart_rate(temp)
+    # Set the time to increase by 3 seconds
+    fileLoc += 3
 
 eventStatus = LORA_STATUS_NORMAL
 lastSendEvent = LORA_STATUS_NORMAL
 loraEventConfidence = 0
+fileLoc = 0
 
 if __name__ == "__main__":
     # Set up signal handler for clean up
@@ -145,5 +177,5 @@ if __name__ == "__main__":
     # a = ex_proc()
     # Set the function to run every x seconds
     print "Set timer to process data repeatedly..."
-    pros_timer = RepeatedTimer(3, h.getData, signal)
+    pros_timer = RepeatedTimer(3, getData, signal)
     # Set the mote to send every minute
