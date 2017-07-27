@@ -10,20 +10,21 @@
 
 **Input Parameters**:
 
-interval
-    Number of seconds to wait before the function is executed
+    interval
+        Number of seconds to wait before the function is executed
 
-function
-    The specified function to be run
+    function
+        The specified function to be run
 
-args
-    The list of arguments for the function
+    \*args
+        The list of arguments for the function
 
-kwargs
-    Arguments for the function that have not been defined
+    \**kwargs
+        Arguments for the function that have not been defined
 
 **Return:** None.
     
+-----
 Head on back_!
 
 .. _back: ../README.rst
