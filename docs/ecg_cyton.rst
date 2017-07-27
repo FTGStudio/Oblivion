@@ -70,7 +70,7 @@
 
 **Return:** The numpy array of the last 5 seconds of data from channel one.
 
-``is_window_ful()``
+``is_window_full()``
 -----
 
 **Function Overview:** Returns if the array is full of 5 seconds of data.
