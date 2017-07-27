@@ -10,7 +10,7 @@
 - If the window is full the data gets processed and stored.
 - Events are checked with each new processing and send asynchronously if needed.
 
-``handler()``
+``handler(signum, frame)``
 -----
 
 **Function Overview:** Signal handler for exiting gracefully.
@@ -47,7 +47,7 @@
 
 **Return:** Returns cytonboard object on success and 0 on failure.
     
-``send_packet_over_lora()``
+``send_packet_over_lora(mote)``
 -----
 
 **Function Overview:** Checks that it is ready to send and then send the average heart rate. This function is called by the RepeatTimer for sending LoRa messages every minute.
@@ -59,7 +59,7 @@
 
 **Return:** None.
     
-``event_status()``
+``event_status(heart_rate)``
 -----
 
 **Function Overview:** Keeps track of the current message status and sends the asynchronous messages. It takes 3 of the same types of statuses in a row to change the current status and send an event message. When sending an event the buffer of heart rates are cleared and the Repeat timer is reset.

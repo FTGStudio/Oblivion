@@ -3,7 +3,7 @@
 
 **File Overview:** Manages connecting, reseting, and reading from the Cyton Biosensing Board.
 
-``__init__()``
+``__init__(self, com)``
 -----
 
 **Function Overview:** Init function establishes connection with the serial port and initializes the channel arrays.
@@ -15,7 +15,7 @@
 
 **Return:** None.
     
-``start_stream()``
+``start_stream(self)``
 -----
 
 **Function Overview:** Stops and resets the Cyton Board and wait until the board is ready to start sending data.
@@ -26,7 +26,7 @@
 
 **Return:** Returns 1 on success and 0 on failure
 
-``stop_stream()``
+``stop_stream(self)``
 -----
 
 **Function Overview:** Stops the stream. Used in interupt handler in main.
@@ -37,7 +37,7 @@
 
 **Return:** None
 
-``read_line()``
+``read_line(self)``
 -----
 
 **Function Overview:** Reads one packets worth of data and unpacks the desired channels of that packet into the channel arrays.
@@ -48,7 +48,7 @@
 
 **Return:** None
 
-``print_line()``
+``print_line(self)``
 -----
 
 **Function Overview:** Mainly debugging function to print the last element of all of the channel arrays.
@@ -59,7 +59,7 @@
 
 **Return:** None
 
-``get_signal()``
+``get_signal(self)``
 -----
 
 **Function Overview:** Returns the first channel array. Shifts the array to have the last two seconds remain in it.
@@ -70,7 +70,7 @@
 
 **Return:** The numpy array of the last 5 seconds of data from channel one.
 
-``is_window_full()``
+``is_window_full(self)``
 -----
 
 **Function Overview:** Returns if the array is full of 5 seconds of data.
