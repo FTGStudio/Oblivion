@@ -3,12 +3,12 @@
 
 **File Overview:** This is the main loop of the process. Heart rate is collected, processed and sent over LoRa.
 
--Connection is made with the LoRa Remote and Cyton Biosensing Board. If connection fails more than 10 times the system will reboot and try again.
--The repeat timer is set to send a LoRa message every 60 seconds.
--The Cyton stream starts. If the ``start_stream()`` function fails 10 times the system will reboot and try again.
--In the main loop, the cyton is continually polled for a new transmition.
--If the window is full the data gets processed and stored.
--Events are checked with each new processing and send asynchronously if needed.
+- Connection is made with the LoRa Remote and Cyton Biosensing Board. If connection fails more than 10 times the system will reboot and try again.
+- The repeat timer is set to send a LoRa message every 60 seconds.
+- The Cyton stream starts. If the ``start_stream()`` function fails 10 times the system will reboot and try again.
+- In the main loop, the cyton is continually polled for a new transmition.
+- If the window is full the data gets processed and stored.
+- Events are checked with each new processing and send asynchronously if needed.
 
 ``handler()``
 -----
