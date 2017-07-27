@@ -82,8 +82,7 @@
 **Return:**
 
     status
-        1 - Successful setup
-        0 - Failed setup
+        1 = Successful connection, 0 = Failed setup
     
 ``connect(self)``
 -----
@@ -95,8 +94,7 @@
 **Return:**
 
     status
-        1 - Successful connection
-        0 - Failed setup
+        1 = Successful connection, 0 = Failed setup
         
 ``send_data(self, heartStatus, heartRate)``
 -----
@@ -114,8 +112,7 @@
 **Return:**
 
     status
-        1 - Successful connection
-        0 - Failed setup
+        1 = Successful connection, 0 = Failed setup
         
 -----
 
