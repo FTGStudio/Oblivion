@@ -24,6 +24,33 @@
 
 **Return:** None.
 
+``_run(self)``
+-----
+
+**Function Overview:** A function for internal use that starts the function thread and starts the timer for the next thread to run.
+
+**Input Parameters:** None.
+
+**Return:** None.
+
+``start(self)``
+-----
+
+**Function Overview:** The start function begins the thread and runs the specified function every time the timer expires. This function is automatically called when the timer is created, but it can be used to restart the thread if the stop function is called.
+
+**Input Parameters:** None.
+
+**Return:** None.
+
+``stop(self)``
+-----
+
+**Function Overview:** The stop function halts the thread by disabling the timer that recalls the function when it expires. This will allow the current function to finish but stops the timer from calling the function again.
+
+**Input Parameters:** None.
+
+**Return:** None.
+
 -----
 
 Head on back_!
